@@ -11,25 +11,34 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 10
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.9"
+          cache: "pip"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pyinstaller
+          pip install --prefer-binary -r requirements.txt pyinstaller
+
       - name: Build exe
         run: pyinstaller --onefile --console --name LivetechRumbleBridge --collect-all vgamepad livetech_bridge.py
+
       - name: SHA256 checksum
         shell: pwsh
         run: |
           Get-FileHash dist\LivetechRumbleBridge.exe -Algorithm SHA256 | ForEach-Object { $_.Hash } | Out-File dist\LivetechRumbleBridge.exe.sha256
+
       - uses: actions/upload-artifact@v4
         with:
           name: LivetechRumbleBridge
           path: dist/*
+
       - name: Attach to release (tags only)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
