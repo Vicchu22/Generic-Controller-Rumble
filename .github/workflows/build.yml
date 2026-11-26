@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 10
 
     steps:
@@ -18,13 +18,13 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.10"
           cache: "pip"
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --prefer-binary -r requirements.txt pyinstaller
+          python -m pip install --upgrade pip setuptools wheel cmake
+          pip install --no-build-isolation -r requirements.txt pyinstaller
 
       - name: Build exe
         run: pyinstaller --onefile --console --name LivetechRumbleBridge --collect-all vgamepad livetech_bridge.py
